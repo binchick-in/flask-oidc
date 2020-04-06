@@ -391,12 +391,15 @@ class OpenIDConnect(object):
         if getattr(g, 'oidc_id_token_dirty', False):
             if g.oidc_id_token:
                 signed_id_token = self.cookie_serializer.dumps(g.oidc_id_token)
-                response.set_cookie(
+                cookie_string = "{}={};Max-Age={};SameSite=None;Path=/;HttpOnly;{}".format(
                     current_app.config['OIDC_ID_TOKEN_COOKIE_NAME'],
-                    signed_id_token,
-                    secure=cookie_secure,
-                    httponly=True,
-                    max_age=current_app.config['OIDC_ID_TOKEN_COOKIE_TTL'])
+                    signed_id_token.decode(),
+                    current_app.config['OIDC_ID_TOKEN_COOKIE_TTL'],
+                    "Secure;" if cookie_secure else ""
+                )
+                # Flask treats default parameter of `set_cookie` to Samesite=None
+                # but chrome requires the string 'None' as the value not a null
+                response.headers.add('Set-Cookie', cookie_string)
             else:
                 # This was a log out
                 response.set_cookie(
