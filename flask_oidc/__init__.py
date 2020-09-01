@@ -391,7 +391,7 @@ class OpenIDConnect(object):
         if getattr(g, 'oidc_id_token_dirty', False):
             if g.oidc_id_token:
                 signed_id_token = self.cookie_serializer.dumps(g.oidc_id_token)
-                cookie_string = "{}={};Max-Age={};SameSite=None;Path=/;HttpOnly;{}".format(
+                cookie_string = "{}={};Max-Age={};SameSite=Lax;Path=/;HttpOnly;{}".format(
                     current_app.config['OIDC_ID_TOKEN_COOKIE_NAME'],
                     signed_id_token.decode(),
                     current_app.config['OIDC_ID_TOKEN_COOKIE_TTL'],
